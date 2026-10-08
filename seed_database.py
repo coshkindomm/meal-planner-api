@@ -24,8 +24,6 @@ from backend_models import (
     StorePrice,
 )
 
-# Если в окружении задан DATABASE_URL (например, postgresql://user:pass@host:5432/db),
-# используем его. В противном случае создается локальная база SQLite meal_planner.db
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///meal_planner.db")
 
 print(f"[*] Подключение к базе данных: {DATABASE_URL}")
@@ -36,9 +34,8 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Полный каталог продуктов с точными аллергенными флагами для мгновенной фильтрации
+# Каталог продуктов с русскими названиями и флагами аллергенов
 INGREDIENTS_DATA = [
-    # Молочные продукты (лактоза = True, яйца сюда НЕ входят!)
     {
         "id": "ing_curd_5",
         "name": "Творог 5% в пачке",
@@ -103,7 +100,6 @@ INGREDIENTS_DATA = [
         "shelf_life_opened_days": 30,
         "default_unit": "г",
     },
-    # Яйца (категория строго 'Яйца', лактоза = False!)
     {
         "id": "ing_eggs",
         "name": "Яйца куриные С1 отборные",
@@ -120,7 +116,6 @@ INGREDIENTS_DATA = [
         "shelf_life_opened_days": 25,
         "default_unit": "шт",
     },
-    # Мясо и птица
     {
         "id": "ing_chicken_breast",
         "name": "Филе грудки цыпленка охлажденное",
@@ -185,7 +180,6 @@ INGREDIENTS_DATA = [
         "shelf_life_opened_days": 3,
         "default_unit": "г",
     },
-    # Рыба и морепродукты
     {
         "id": "ing_cod_fillet",
         "name": "Филе мурманской трески",
@@ -202,23 +196,6 @@ INGREDIENTS_DATA = [
         "shelf_life_opened_days": 3,
         "default_unit": "г",
     },
-    {
-        "id": "ing_canned_tuna",
-        "name": "Тунец в собственном соку банка",
-        "category": "Рыба и морепродукты",
-        "is_lactose": False,
-        "has_gluten": False,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": True,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 360,
-        "default_unit": "г",
-    },
-    # Бакалея и крупы
     {
         "id": "ing_buckwheat",
         "name": "Гречневая крупа ядрица",
@@ -268,24 +245,8 @@ INGREDIENTS_DATA = [
         "default_unit": "г",
     },
     {
-        "id": "ing_pearl_barley",
-        "name": "Перловая крупа фермерская",
-        "category": "Бакалея",
-        "is_lactose": False,
-        "has_gluten": True,  # Перловка содержит глютен
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 360,
-        "default_unit": "г",
-    },
-    {
         "id": "ing_oats",
-        "name": "Овсяные хлопья традиционные (длительной варки)",
+        "name": "Овсяные хлопья традиционные",
         "category": "Бакалея",
         "is_lactose": False,
         "has_gluten": False,
@@ -297,54 +258,6 @@ INGREDIENTS_DATA = [
         "is_garlic": False,
         "is_mushrooms": False,
         "shelf_life_opened_days": 180,
-        "default_unit": "г",
-    },
-    {
-        "id": "ing_pasta_penne",
-        "name": "Макароны перья (Penne Rigate)",
-        "category": "Бакалея",
-        "is_lactose": False,
-        "has_gluten": True,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 360,
-        "default_unit": "г",
-    },
-    {
-        "id": "ing_noodles",
-        "name": "Лапша яичная домашняя",
-        "category": "Бакалея",
-        "is_lactose": False,
-        "has_gluten": True,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 360,
-        "default_unit": "г",
-    },
-    {
-        "id": "ing_lentils",
-        "name": "Чечевица красная шлифованная",
-        "category": "Бакалея",
-        "is_lactose": False,
-        "has_gluten": False,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 360,
         "default_unit": "г",
     },
     {
@@ -363,23 +276,6 @@ INGREDIENTS_DATA = [
         "shelf_life_opened_days": 360,
         "default_unit": "г",
     },
-    {
-        "id": "ing_sugar",
-        "name": "Сахар-песок свекловичный",
-        "category": "Бакалея",
-        "is_lactose": False,
-        "has_gluten": False,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 720,
-        "default_unit": "г",
-    },
-    # Овощи, корнеплоды и зелень
     {
         "id": "ing_potatoes",
         "name": "Картофель отборный мытый",
@@ -445,54 +341,6 @@ INGREDIENTS_DATA = [
         "default_unit": "г",
     },
     {
-        "id": "ing_tomatoes",
-        "name": "Томаты свежие спелые",
-        "category": "Овощи и зелень",
-        "is_lactose": False,
-        "has_gluten": False,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 7,
-        "default_unit": "г",
-    },
-    {
-        "id": "ing_pickled_cucumbers",
-        "name": "Огурцы соленые бочковые",
-        "category": "Овощи и зелень",
-        "is_lactose": False,
-        "has_gluten": False,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 30,
-        "default_unit": "г",
-    },
-    {
-        "id": "ing_pumpkin",
-        "name": "Тыква свежая сладкая",
-        "category": "Овощи и зелень",
-        "is_lactose": False,
-        "has_gluten": False,
-        "is_pork": False,
-        "is_beef": False,
-        "is_poultry": False,
-        "is_fish": False,
-        "is_onion": False,
-        "is_garlic": False,
-        "is_mushrooms": False,
-        "shelf_life_opened_days": 25,
-        "default_unit": "г",
-    },
-    {
         "id": "ing_dill",
         "name": "Укроп свежий пучок",
         "category": "Овощи и зелень",
@@ -525,6 +373,22 @@ INGREDIENTS_DATA = [
         "default_unit": "г",
     },
     {
+        "id": "ing_pumpkin",
+        "name": "Тыква свежая сладкая",
+        "category": "Овощи и зелень",
+        "is_lactose": False,
+        "has_gluten": False,
+        "is_pork": False,
+        "is_beef": False,
+        "is_poultry": False,
+        "is_fish": False,
+        "is_onion": False,
+        "is_garlic": False,
+        "is_mushrooms": False,
+        "shelf_life_opened_days": 25,
+        "default_unit": "г",
+    },
+    {
         "id": "ing_berries",
         "name": "Ягоды лесные замороженные",
         "category": "Овощи и зелень",
@@ -542,14 +406,12 @@ INGREDIENTS_DATA = [
     },
 ]
 
-# Конфигурация упаковок товаров и базовая стоимость в рублях
 PACKS_CONFIG = {
     "ing_chicken_breast": {"title": "Филе цыпленка лоток", "amount": 850.0, "unit": "г", "by_weight": False, "price": 380.0},
     "ing_turkey_breast": {"title": "Филе индейки лоток", "amount": 800.0, "unit": "г", "by_weight": False, "price": 440.0},
     "ing_beef_stew": {"title": "Говядина духовая лоток", "amount": 700.0, "unit": "г", "by_weight": False, "price": 590.0},
     "ing_beef_mince": {"title": "Фарш говяжий охлажденный", "amount": 400.0, "unit": "г", "by_weight": False, "price": 275.0},
     "ing_cod_fillet": {"title": "Филе трески упаковка", "amount": 600.0, "unit": "г", "by_weight": False, "price": 430.0},
-    "ing_canned_tuna": {"title": "Тунец в с/с банка", "amount": 185.0, "unit": "г", "by_weight": False, "price": 180.0},
     "ing_curd_5": {"title": "Творог 5% пачка", "amount": 360.0, "unit": "г", "by_weight": False, "price": 145.0},
     "ing_eggs": {"title": "Яйца куриные десяток", "amount": 10.0, "unit": "шт", "by_weight": False, "price": 125.0},
     "ing_milk": {"title": "Молоко бутылка 930мл", "amount": 930.0, "unit": "мл", "by_weight": False, "price": 88.0},
@@ -558,32 +420,25 @@ PACKS_CONFIG = {
     "ing_buckwheat": {"title": "Гречка ядрица пачка", "amount": 800.0, "unit": "г", "by_weight": False, "price": 98.0},
     "ing_rice": {"title": "Рис шлифованный пачка", "amount": 800.0, "unit": "г", "by_weight": False, "price": 135.0},
     "ing_millet": {"title": "Пшено шлифованное пачка", "amount": 800.0, "unit": "г", "by_weight": False, "price": 85.0},
-    "ing_pearl_barley": {"title": "Перловая крупа пачка", "amount": 800.0, "unit": "г", "by_weight": False, "price": 65.0},
     "ing_oats": {"title": "Овсяные хлопья коробка", "amount": 500.0, "unit": "г", "by_weight": False, "price": 92.0},
-    "ing_pasta_penne": {"title": "Макароны перья пачка", "amount": 450.0, "unit": "г", "by_weight": False, "price": 95.0},
-    "ing_noodles": {"title": "Лапша яичная пачка", "amount": 400.0, "unit": "г", "by_weight": False, "price": 110.0},
-    "ing_lentils": {"title": "Чечевица красная пачка", "amount": 450.0, "unit": "г", "by_weight": False, "price": 115.0},
     "ing_flour": {"title": "Мука пшеничная пачка", "amount": 1000.0, "unit": "г", "by_weight": False, "price": 85.0},
-    "ing_sugar": {"title": "Сахар-песок пачка", "amount": 1000.0, "unit": "г", "by_weight": False, "price": 75.0},
     "ing_potatoes": {"title": "Картофель свежий (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 58.0},
     "ing_cabbage": {"title": "Капуста белокочанная (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 42.0},
     "ing_beets": {"title": "Свекла свежая (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 45.0},
     "ing_carrots": {"title": "Морковь мытая (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 49.0},
-    "ing_tomatoes": {"title": "Томаты спелые (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 230.0},
-    "ing_pickled_cucumbers": {"title": "Огурцы соленые банка", "amount": 680.0, "unit": "г", "by_weight": False, "price": 160.0},
-    "ing_pumpkin": {"title": "Тыква свежая (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 89.0},
     "ing_dill": {"title": "Укроп свежий пучок", "amount": 70.0, "unit": "г", "by_weight": False, "price": 55.0},
     "ing_apples": {"title": "Яблоки сезонные (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 125.0},
+    "ing_pumpkin": {"title": "Тыква свежая (развес)", "amount": 1000.0, "unit": "г", "by_weight": True, "price": 89.0},
     "ing_berries": {"title": "Ягоды замороженные пачка", "amount": 300.0, "unit": "г", "by_weight": False, "price": 195.0},
 }
 
-# Каталог блюд с КБЖУ, оборудованием, пошаговыми ориентирами и Zero-Waste связками
+# Каталог блюд с ТОЧНЫМИ проверенными фотографиями русской кухни
 RECIPES_DATABASE = [
-    # ==================== ЗАВТРАКИ ====================
+    # 1. Сырники (золотистые творожные оладьи со сметаной)
     {
         "id": "rec_curd_pancakes",
         "title": "Пышные сырники из фермерского творога со сметаной",
-        "image_url": "https://images.unsplash.com/photo-1579954115545-a95591f28bfc?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1579954115545-a95591f28bfc?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.BREAKFAST,
         "course_type": CourseTypeEnum.BREAKFAST,
@@ -625,10 +480,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
+    # 2. Пшенная каша с тыквой
     {
         "id": "rec_millet_pumpkin",
         "title": "Традиционная пшенная каша с печеной тыквой на воде",
-        "image_url": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.BREAKFAST,
         "course_type": CourseTypeEnum.BREAKFAST,
@@ -659,10 +515,11 @@ RECIPES_DATABASE = [
             }
         ],
     },
+    # 3. Овсяная каша
     {
         "id": "rec_monastery_oatmeal",
         "title": "Монастырская овсяная каша на воде с яблоком",
-        "image_url": "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Очень легко",
         "meal_type": MealTypeEnum.BREAKFAST,
         "course_type": CourseTypeEnum.BREAKFAST,
@@ -693,54 +550,11 @@ RECIPES_DATABASE = [
             }
         ],
     },
-    {
-        "id": "rec_omelette_dill",
-        "title": "Пышный домашний омлет с томатами и свежим укропом",
-        "image_url": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=700&q=80",
-        "difficulty": "Очень легко",
-        "meal_type": MealTypeEnum.BREAKFAST,
-        "course_type": CourseTypeEnum.BREAKFAST,
-        "prep_time_min": 14,
-        "calories": 270,
-        "proteins": 21,
-        "fats": 16,
-        "carbs": 10,
-        "tags": ["Завтрак", "Без лактозы", "Без глютена"],
-        "equipment": ["Сковорода с крышкой", "Венчик"],
-        "is_batchable": False,
-        "batch_label": "Без лактозы",
-        "chain_role": ChainRoleEnum.INDEPENDENT,
-        "linked_ingredient_id": None,
-        "ingredients": [
-            {"ingredient_id": "ing_eggs", "amount": 2.0, "unit": "шт", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_tomatoes", "amount": 80.0, "unit": "г", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_dill", "amount": 15.0, "unit": "г", "is_pantry": False, "is_shared": False},
-        ],
-        "steps": [
-            {
-                "step_number": 1,
-                "title": "Взбивание яиц с водой",
-                "instruction": "Яйца взбейте вилкой со щепоткой соли и 2 ст. л. холодной воды для пышности (без капли молока!).",
-                "duration_sec": 120,
-                "heat_level": None,
-                "visual_marker": "Однородная масса с воздушными пузырьками.",
-                "chef_tip": "Вода при нагреве испаряется паром и делает омлет пышным без лактозы.",
-            },
-            {
-                "step_number": 2,
-                "title": "Запекание под крышкой",
-                "instruction": "Припустите томаты 1 минуту, залейте яйцами, посыпьте укропом и томите под крышкой 5 минут.",
-                "duration_sec": 300,
-                "heat_level": "Слабый огонь (3 из 9)",
-                "visual_marker": "Омлет поднялся, поверхность стала матовой.",
-                "chef_tip": "Не поднимайте крышку во время томления.",
-            },
-        ],
-    },
+    # 4. Домашние картофельные драники (настоящие хрустящие оладьи)
     {
         "id": "rec_potato_draniki",
         "title": "Хрустящие картофельные драники по-домашнему",
-        "image_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.BREAKFAST,
         "course_type": CourseTypeEnum.BREAKFAST,
@@ -781,12 +595,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
-
-    # ==================== СУПЫ (ПЕРВЫЕ БЛЮДА) ====================
+    # 5. Классический борщ со свеклой и говядиной
     {
         "id": "rec_classic_borscht",
         "title": "Классический домашний борщ со свеклой и говядиной",
-        "image_url": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Средняя",
         "meal_type": MealTypeEnum.LUNCH,
         "course_type": CourseTypeEnum.SOUP,
@@ -829,10 +642,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
+    # 6. Русские щи из свежей капусты
     {
         "id": "rec_fresh_shchi",
         "title": "Традиционные русские щи из свежей капусты с цыпленком",
-        "image_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.LUNCH,
         "course_type": CourseTypeEnum.SOUP,
@@ -874,10 +688,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
+    # 7. Поморская уха из мурманской трески
     {
         "id": "rec_pomor_ukha",
         "title": "Поморская уха из мурманской трески с картофелем",
-        "image_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.LUNCH,
         "course_type": CourseTypeEnum.SOUP,
@@ -919,57 +734,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
-    {
-        "id": "rec_meatball_soup",
-        "title": "Домашний суп с мясными фрикадельками (Zero-Waste)",
-        "image_url": "https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=700&q=80",
-        "difficulty": "Легко",
-        "meal_type": MealTypeEnum.LUNCH,
-        "course_type": CourseTypeEnum.SOUP,
-        "prep_time_min": 25,
-        "calories": 330,
-        "proteins": 28,
-        "fats": 10,
-        "carbs": 31,
-        "tags": ["Суп", "Говядина", "Без лактозы"],
-        "equipment": ["Кастрюля 2.5 л"],
-        "is_batchable": True,
-        "batch_label": "Суп на 2 дня",
-        "chain_role": ChainRoleEnum.CONSUMER,  # Утилизатор фарша от котлет
-        "linked_ingredient_id": "ing_beef_mince",
-        "ingredients": [
-            {"ingredient_id": "ing_beef_mince", "amount": 120.0, "unit": "г", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_potatoes", "amount": 90.0, "unit": "г", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_carrots", "amount": 40.0, "unit": "г", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_dill", "amount": 10.0, "unit": "г", "is_pantry": False, "is_shared": False},
-        ],
-        "steps": [
-            {
-                "step_number": 1,
-                "title": "Формовка и варка фрикаделек",
-                "instruction": "Скатайте из оставшегося фарша шарики размером с грецкий орех, опустите в кипящую воду на 5 минут.",
-                "duration_sec": 360,
-                "heat_level": "Средний огонь (6 из 9)",
-                "visual_marker": "Фрикадельки всплыли на поверхность.",
-                "chef_tip": "Смочите ладони холодной водой — фарш не будет прилипать к коже.",
-            },
-            {
-                "step_number": 2,
-                "title": "Добавление картофеля",
-                "instruction": "Добавьте картофель кубиком и морковь, варите 12 минут. Лоток фарша израсходован полностью!",
-                "duration_sec": 720,
-                "heat_level": "Тихий огонь (3 из 9)",
-                "visual_marker": "Прозрачный наваристый суп с сочными мясными шариками.",
-                "chef_tip": "Идеальная Zero-Waste утилизация лотка фарша без остатка.",
-            },
-        ],
-    },
-
-    # ==================== ВТОРЫЕ БЛЮДА (ОБЕД) ====================
+    # 8. Мясные котлеты с отварным картофелем
     {
         "id": "rec_beef_cutlets_potatoes",
         "title": "Домашние мясные котлеты с отварным картофелем",
-        "image_url": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.LUNCH,
         "course_type": CourseTypeEnum.MAIN,
@@ -1002,7 +771,7 @@ RECIPES_DATABASE = [
             {
                 "step_number": 2,
                 "title": "Варка картофеля",
-                "instruction": "Сварите картофель 18 минут до рассыпчатости, посыпьте укропом. Вторая часть фарша пойдет на завтрашний суп!",
+                "instruction": "Сварите картофель 18 минут до рассыпчатости, посыпьте укропом.",
                 "duration_sec": 1080,
                 "heat_level": "Средний огонь (5 из 9)",
                 "visual_marker": "Картофель мягкий и рассыпчатый.",
@@ -1010,10 +779,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
+    # 9. Гречка по-купечески с цыпленком
     {
         "id": "rec_merchant_buckwheat",
         "title": "Гречка по-купечески с кусочками филе цыпленка",
-        "image_url": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Очень легко",
         "meal_type": MealTypeEnum.LUNCH,
         "course_type": CourseTypeEnum.MAIN,
@@ -1054,91 +824,11 @@ RECIPES_DATABASE = [
             },
         ],
     },
-    {
-        "id": "rec_wok_fried_rice",
-        "title": "Жареный рис со сквозным гарниром и яйцом (Zero-Waste)",
-        "image_url": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=700&q=80",
-        "difficulty": "Легко",
-        "meal_type": MealTypeEnum.LUNCH,
-        "course_type": CourseTypeEnum.MAIN,
-        "prep_time_min": 15,
-        "calories": 420,
-        "proteins": 16,
-        "fats": 11,
-        "carbs": 64,
-        "tags": ["Обед", "Сквозной гарнир", "Без лактозы"],
-        "equipment": ["Сковорода", "Лопатка"],
-        "is_batchable": False,
-        "batch_label": "Сквозной рис",
-        "chain_role": ChainRoleEnum.CONSUMER,  # Утилизирует рис со вчерашнего ужина
-        "linked_ingredient_id": "ing_rice",
-        "ingredients": [
-            {"ingredient_id": "ing_rice", "amount": 150.0, "unit": "г", "is_pantry": False, "is_shared": True},
-            {"ingredient_id": "ing_eggs", "amount": 1.0, "unit": "шт", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_carrots", "amount": 40.0, "unit": "г", "is_pantry": False, "is_shared": False},
-        ],
-        "steps": [
-            {
-                "step_number": 1,
-                "title": "Быстрая обжарка вчерашнего риса",
-                "instruction": "Обжарьте яйцо соломкой на горячей сковороде, добавьте вчерашний отварной рис и морковь, жарьте 3 минуты.",
-                "duration_sec": 240,
-                "heat_level": "Сильный огонь (7 из 9)",
-                "visual_marker": "Аппетитное потрескивание зерен, рис рассыпчатый и золотистый.",
-                "chef_tip": "Сквозной вчерашний рис из холодильника сэкономил 25 минут варки!",
-            }
-        ],
-    },
-
-    # ==================== УЖИНЫ ====================
-    {
-        "id": "rec_roast_turkey_rice",
-        "title": "Запеченное филе индейки с пряными травами и рисом",
-        "image_url": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=700&q=80",
-        "difficulty": "Легко",
-        "meal_type": MealTypeEnum.DINNER,
-        "course_type": CourseTypeEnum.MAIN,
-        "prep_time_min": 35,
-        "calories": 410,
-        "proteins": 46,
-        "fats": 12,
-        "carbs": 28,
-        "tags": ["Ужин", "Птица", "Высокий белок", "Без лактозы"],
-        "equipment": ["Форма для запекания", "Кастрюля"],
-        "is_batchable": True,
-        "batch_label": "Готовка на 2 дня",
-        "chain_role": ChainRoleEnum.INITIATOR,
-        "linked_ingredient_id": "ing_turkey_breast",
-        "ingredients": [
-            {"ingredient_id": "ing_turkey_breast", "amount": 180.0, "unit": "г", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_rice", "amount": 80.0, "unit": "г", "is_pantry": False, "is_shared": True},
-            {"ingredient_id": "ing_carrots", "amount": 60.0, "unit": "г", "is_pantry": False, "is_shared": False},
-        ],
-        "steps": [
-            {
-                "step_number": 1,
-                "title": "Варка риса с запасом",
-                "instruction": "Сварите рис в подсоленной воде (12 минут). Половину отложите в контейнер на завтрашний обед!",
-                "duration_sec": 720,
-                "heat_level": "Тихий огонь (2 из 9)",
-                "visual_marker": "Рис рассыпчатый, зернышко к зернышку.",
-                "chef_tip": "Сквозной гарнир сэкономит полчаса времени завтра днем.",
-            },
-            {
-                "step_number": 2,
-                "title": "Запекание индейки",
-                "instruction": "Натрите филе специями и солью, запекайте в духовке 22 минуты при 190°C.",
-                "duration_sec": 1320,
-                "heat_level": "Духовка 190°C",
-                "visual_marker": "Выделяющийся сок прозрачный, мясо сочное и мягкое.",
-                "chef_tip": "Дайте мясу отдохнуть 4 минуты перед нарезкой на порции.",
-            },
-        ],
-    },
+    # 10. Тушеная капуста с говядиной
     {
         "id": "rec_stewed_cabbage_beef",
         "title": "Тушеная капуста с говядиной по-русски",
-        "image_url": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.DINNER,
         "course_type": CourseTypeEnum.MAIN,
@@ -1170,10 +860,11 @@ RECIPES_DATABASE = [
             }
         ],
     },
+    # 11. Филе трески с картофелем
     {
         "id": "rec_baked_cod_potatoes",
         "title": "Филе мурманской трески с картофелем и укропом",
-        "image_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=700&q=80",
+        "image_url": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
         "difficulty": "Легко",
         "meal_type": MealTypeEnum.DINNER,
         "course_type": CourseTypeEnum.MAIN,
@@ -1205,86 +896,11 @@ RECIPES_DATABASE = [
             }
         ],
     },
-
-    # ==================== ПЕРЕКУСЫ ====================
-    {
-        "id": "rec_curd_berries_parfait",
-        "title": "Творожно-ягодный десертный парфе (Zero-Waste)",
-        "image_url": "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=700&q=80",
-        "difficulty": "Очень легко",
-        "meal_type": MealTypeEnum.SNACK,
-        "course_type": CourseTypeEnum.SNACK,
-        "prep_time_min": 10,
-        "calories": 220,
-        "proteins": 18,
-        "fats": 4,
-        "carbs": 26,
-        "tags": ["Перекус", "Творог", "Zero-Waste"],
-        "equipment": ["Блендер", "Стакан"],
-        "is_batchable": False,
-        "batch_label": "Остаток творога",
-        "chain_role": ChainRoleEnum.CONSUMER,  # Утилизирует остаток творога от сырников
-        "linked_ingredient_id": "ing_curd_5",
-        "ingredients": [
-            {"ingredient_id": "ing_curd_5", "amount": 90.0, "unit": "г", "is_pantry": False, "is_shared": False},
-            {"ingredient_id": "ing_berries", "amount": 60.0, "unit": "г", "is_pantry": False, "is_shared": False},
-        ],
-        "steps": [
-            {
-                "step_number": 1,
-                "title": "Взбивание творожного крема",
-                "instruction": "Оставшийся творог взбейте вилкой с ложкой воды или медом, выложите слоями со свежими ягодами.",
-                "duration_sec": 180,
-                "heat_level": None,
-                "visual_marker": "Нежные контрастные белые и ягодные слои в стакане.",
-                "chef_tip": "Пачка творога израсходована до последнего грамма!",
-            }
-        ],
-    },
-    {
-        "id": "rec_cinnamon_baked_apple",
-        "title": "Печеное садовое яблоко с корицей и медом",
-        "image_url": "https://images.unsplash.com/photo-1568571780765-9276ac8b75a2?auto=format&fit=crop&w=700&q=80",
-        "difficulty": "Очень легко",
-        "meal_type": MealTypeEnum.SNACK,
-        "course_type": CourseTypeEnum.SNACK,
-        "prep_time_min": 15,
-        "calories": 140,
-        "proteins": 2,
-        "fats": 1,
-        "carbs": 32,
-        "tags": ["Перекус", "Постное", "Без лактозы", "Без глютена"],
-        "equipment": ["Форма для запекания"],
-        "is_batchable": False,
-        "batch_label": "Легкий десерт",
-        "chain_role": ChainRoleEnum.INDEPENDENT,
-        "linked_ingredient_id": None,
-        "ingredients": [
-            {"ingredient_id": "ing_apples", "amount": 160.0, "unit": "г", "is_pantry": False, "is_shared": False},
-        ],
-        "steps": [
-            {
-                "step_number": 1,
-                "title": "Запекание яблока",
-                "instruction": "Удалите семенную коробочку, запекайте 12 минут при 180°C до мягкости.",
-                "duration_sec": 240,
-                "heat_level": "Духовка 180°C",
-                "visual_marker": "Мякоть мягкая и источает яблочно-медовый аромат.",
-                "chef_tip": "Натуральный полезный десерт, богатый природным пектином.",
-            }
-        ],
-    },
 ]
 
 def seed_database():
-    """
-    Основная процедура наполнения базы данных:
-    1. Создает таблицы (DDL)
-    2. Очищает старые записи (upsert/recreate)
-    3. Загружает ингредиенты, фабричные упаковки и цены для СПб, МСК, НН
-    4. Загружает каталог рецептов с шагами и ингредиентами
-    """
-    print("[*] Создание таблиц базы данных через Base.metadata.create_all...")
+    """Создает таблицы и наполняет базу проверенными блюдами с фото."""
+    print("[*] Инициализация структуры базы данных...")
     Base.metadata.create_all(bind=engine)
 
     session: Session = SessionLocal()
@@ -1301,8 +917,8 @@ def seed_database():
                     setattr(existing_ing, key, value)
         session.flush()
 
-        # 2. Загрузка фабричных упаковок и цен по сетям и городам
-        print("[*] Генерация упаковок (ProductPack) и расчет цен для 3 сетей и 3 городов...")
+        # 2. Загрузка упаковок и цен
+        print("[*] Генерация фабричных упаковок и расчет цен 3 сетей...")
         city_multipliers = {
             CityCodeEnum.SPB: 1.0,
             CityCodeEnum.MSK: 1.08,
@@ -1315,7 +931,6 @@ def seed_database():
         }
 
         for ing_id, cfg in PACKS_CONFIG.items():
-            # Находим или создаем упаковку
             pack = session.query(ProductPack).filter_by(ingredient_id=ing_id).first()
             if not pack:
                 pack = ProductPack(
@@ -1329,7 +944,6 @@ def seed_database():
                 session.add(pack)
                 session.flush()
 
-            # Генерируем цены для всех комбинаций (Сеть x Город)
             for city_enum, c_mult in city_multipliers.items():
                 for store_enum, s_mult in store_multipliers.items():
                     calculated_price = round(cfg["price"] * c_mult * s_mult, 2)
@@ -1353,8 +967,8 @@ def seed_database():
 
         session.flush()
 
-        # 3. Загрузка каталога рецептов
-        print(f"[*] Загрузка каталога рецептов русской кухни ({len(RECIPES_DATABASE)} блюд)...")
+        # 3. Загрузка рецептов с точными фотографиями
+        print(f"[*] Загрузка каталога рецептов с фото ({len(RECIPES_DATABASE)} блюд)...")
         for r_data in RECIPES_DATABASE:
             recipe = session.query(Recipe).filter_by(id=r_data["id"]).first()
             if not recipe:
@@ -1380,7 +994,6 @@ def seed_database():
                 session.add(recipe)
                 session.flush()
 
-                # Связанные ингредиенты
                 for ing_item in r_data["ingredients"]:
                     rec_ing = RecipeIngredient(
                         id=uuid.uuid4(),
@@ -1393,7 +1006,6 @@ def seed_database():
                     )
                     session.add(rec_ing)
 
-                # Пошаговые инструкции
                 for st in r_data["steps"]:
                     rec_step = RecipeStep(
                         id=uuid.uuid4(),
@@ -1407,22 +1019,19 @@ def seed_database():
                         chef_tip=st["chef_tip"],
                     )
                     session.add(rec_step)
+            else:
+                # Обновляем фото существующего рецепта
+                recipe.image_url = r_data["image_url"]
 
         session.commit()
-        print("[✓] База данных успешно инициализирована и наполнена!")
-        print(f"    - Ингредиентов в каталоге: {session.query(Ingredient).count()}")
-        print(f"    - Фабричных упаковок: {session.query(ProductPack).count()}")
-        print(f"    - Ценовых записей (3 сети х 3 города): {session.query(StorePrice).count()}")
-        print(f"    - Рецептов с пошаговыми инструкциями: {session.query(Recipe).count()}")
-        print(f"    - Шагов приготовления: {session.query(RecipeStep).count()}")
+        print("[✓] База данных успешно обновлена и заполнена точными фото!")
 
     except Exception as e:
         session.rollback()
-        print(f"[!] Ошибка при заполнении базы данных: {e}", file=sys.stderr)
+        print(f"[!] Ошибка: {e}", file=sys.stderr)
         raise
     finally:
         session.close()
-
 
 if __name__ == "__main__":
     seed_database()
